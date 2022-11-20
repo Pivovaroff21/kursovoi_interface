@@ -3,6 +3,7 @@ html {
 }
 
 body {
+  box-sizing: border-box;
   font-family: "Roboto", sans-serif;
   font-size: normal;
   font-weight: 500;
@@ -67,7 +68,67 @@ img {
 
 }
 
+.tariff_operator_name{
+    margin-bottom: 50px;
+}
+
 .operator_link{
     text-decoration: none;
 }
 /*operator styles ends*/
+
+/* tariff styles start*/
+
+.tariff_card{
+    width: 200px;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 24px;
+    min-height: 200px;
+    border-radius: 9px;
+    border: 1px solid rgba(125,125,125,.27);
+    transition: all .57s cubic-bezier(0,0,.58,1);
+    padding:20px ;
+    background-color:#fff;
+}
+
+.tariff_cards_wrap{
+    display:flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    color: #7d7d7d;
+}
+.tariff_cost{
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #000;
+
+}
+
+.tariff_desc{
+    margin-bottom:10px;
+}
+
+.tariff_link{
+    display: block;
+    max-width: 140px;
+    margin:0 auto;
+    text-decoration: none;
+    border-radius: 25px;
+    background-image: -webkit-linear-gradient(-136deg,#f28cb2 0,#f172a0 47%,#f24a88 100%);
+    cursor: pointer;
+    color:#fff;
+    padding: 20px;
+    transition: 0.25s;
+    text-align: center;
+}
+
+.tariff_link:hover{
+    opacity:0.7;
+}
+
+.tariff_name{
+    font-size: 20px;
+    margin-bottom: 10px;
+}
