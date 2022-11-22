@@ -1,214 +1,120 @@
+import Swiper from "https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.esm.browser.min.js";
+
 /* Router */
-
-const Home = {
-  data() {
-    return {
-      message: "",
-      operators: [
-        {
-          id: 1,
-          name: "Vodafone",
-        },
-        {
-          id: 2,
-          name: "Kyivstar",
-        },
-        {
-          id: 3,
-          name: "Lifecell",
-        },
-      ],
-    };
-  },
-  template: `<div class="operator_cards_wrap">
-                <div  v-for="op in operators">
-                  <router-link :to="{name: 'operatorId', params: {id: op.id}}" class="operator_link">
-                      <div class="operator_card">
-                         <h2 class="operator_name"> {{op.name}}</h2>
-                      </div>
-                  </router-link>
-                </div>
-            </div>`,
-};
-
-const Operator = {
-  data() {
-    return {
-      operatorId: this.$route.params.id,
-      operators: [
-        {
-          id: 1,
-          name: "Vodafone",
-        },
-        {
-          id: 2,
-          name: "Kyivstar",
-        },
-        {
-          id: 3,
-          name: "Lifecell",
-        },
-      ],
-      tariffs: [
-        {
-          id: 1,
-          operatorId: 1,
-          name: "Сімейний",
-          cost: 150,
-        },
-        {
-          id: 2,
-          operatorId: 1,
-          name: "Для бомжей",
-          cost: 15,
-        },
-        {
-          id: 3,
-          operatorId: 1,
-          name: "Средний",
-          cost: 75,
-        },
-        {
-          id: 4,
-          operatorId: 1,
-          name: "Веселий",
-          cost: 228,
-        },
-        {
-          id: 5,
-          operatorId: 1,
-          name: "Інтернет на повну",
-          cost: 320,
-        },
-        {
-          id: 6,
-          operatorId: 1,
-          name: "ТОп за свої гроші",
-          cost: 190,
-        },
-      ],
-      operator: {},
-      tariff: {},
-    };
-  },
-  methods: {
-    getOperator() {
-      this.operator = this.operators.find(
-        (op) => op.id === Number(this.operatorId)
-      );
-      this.tariff = this.tariffs.filter(
-        (t) => t.operatorId === Number(this.operatorId)
-      );
-    },
-  },
-  created() {
-    this.getOperator();
-  },
-  template: `
-      <h1 class="operator_name tariff_operator_name">{{operator.name}}</h1>
-        <div class="tariff_cards_wrap">
-          <div  class="tariff_card" v-for="t in tariff">
-            <h2 class="tariff_name">{{t.name}}</h2>
-            <p class="tariff_cost">{{t.cost}} грн/міс</p>
-            <p class="tariff_desc"> Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне. 
-            Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. </p>
-            <router-link :to="{name:'tariffId', params: {id: t.id}}" class="tariff_link">
-                Оплатити
-            </router-link>
-          </div>
-      </div>`,
-};
 
 const PayPage = {
   data() {
     return {
-      tariffId: this.$route.params.id,
-      operators: [
-        {
-          id: 1,
-          name: "Vodafone",
-        },
-        {
-          id: 2,
-          name: "Kyivstar",
-        },
-        {
-          id: 3,
-          name: "Lifecell",
-        },
-      ],
-      tariffs: [
-        {
-          id: 1,
-          operatorId: 2,
-          name: "Сімейний",
-          cost: 150,
-        },
-        {
-          id: 2,
-          operatorId: 1,
-          name: "Для бомжей",
-          cost: 15,
-        },
-        {
-          id: 3,
-          operatorId: 3,
-          name: "Средний",
-          cost: 75,
-        },
-        {
-          id: 4,
-          operatorId: 1,
-          name: "Веселий",
-          cost: 228,
-        },
-        {
-          id: 5,
-          operatorId: 2,
-          name: "Інтернет на повну",
-          cost: 320,
-        },
-        {
-          id: 6,
-          operatorId: 3,
-          name: "ТОп за свої гроші",
-          cost: 190,
-        },
-      ],
-      operator: {},
-      tariff: {},
+      operators: [],
+      errors: [],
+      isCodeValid: false,
+      isPhoneValid: false,
+      currentOperatorId: "",
     };
   },
   methods: {
-    getTariff() {
-      this.tariff = this.tariffs.find((t) => t.id === Number(this.tariffId));
-      if (this.tariffId) {
-        this.operator = this.operators.find(
-          (op) => op.id === Number(this.tariff.operatorId)
-        );
+    setValue(e) {
+      const value = e.target.textContent.split(" ")[0];
+      this.$el.querySelector("#price-input").value = value;
+    },
+    showOperator(e) {
+      const value = e.target.value;
+      const logo = this.$el.querySelector(".phone_input_wrap").style;
+      const phoneError = this.$el.querySelector(".phone_error");
+      if (value.length === 2) {
+        let currentOperator = this.operators.find((op) => op.code === value);
+        if (currentOperator) {
+          logo.setProperty("--background", `url(../${currentOperator.id}.png)`);
+          this.currentOperatorId = currentOperator.id;
+          phoneError.style.display = "none";
+          this.isCodeValid = true;
+        } else {
+          this.isCodeValid = false;
+          phoneError.textContent = "Невірний код оператора";
+          phoneError.style.display = "block";
+        }
+      }
+      if (value.length < 2) {
+        logo.setProperty("--background", `none`);
+      }
+    },
+    checkData() {
+      const phoneError = this.$el.querySelector(".phone_error");
+      const priceError = this.$el.querySelector(".price_error");
+      const priceInput = this.$el.querySelector("#price-input").value;
+      const phoneInput = this.$el.querySelector(".phone_form_input");
+
+      if (phoneInput.value.length === 9) {
+        this.isPhoneValid = true;
+      } else {
+        this.isPhoneValid = false;
+        phoneError.textContent = "Невірний номер";
+        phoneError.style.display = "block";
+      }
+      if (priceInput) {
+        priceError.style.display = "none";
+      } else {
+        priceError.textContent = "Ви не ввели суму поповнення";
+        priceError.style.display = "block";
+      }
+      if (this.isPhoneValid && priceInput && this.isCodeValid) {
+        localStorage.setItem("transactionData",JSON.stringify( {
+          operatorId: this.currentOperatorId,
+          phone: `+38${phoneInput.value}`,
+          totalValue:priceInput
+        }));
+        router.push('/pay/card');
       }
     },
   },
+
   created() {
-    this.getTariff();
+    axios
+      .get(
+        `http://kursovoiproject/api/getOperators?auth=dIC349vWSpXx234NmQP21rvIeDd`
+      )
+      .then((response) => {
+        this.operators = response.data;
+      })
+      .catch((e) => {
+        this.errors.push(e);
+      });
   },
   template: `
-      <div class="wrapper">
-        <h1>{{operator.name}}</h1>
-        <h2>{{tariff.name}}</h2>
-        <form action="">
-            <label for="">
-                ВВедите что-то
-                <input type="text">
-            </label>
-            <label for="">
-                ВВедите что-то
-                <input type="text">
-            </label>
-            <router-link to="/pay/card" class="tariff_link">
-                Оплатити
-            </router-link>
-        </form>
+      <div class="wrapper_form">
+        <div class="centered  card_form">
+          <form class="phone_form" action="">
+              <label class="phone_form_text " for="">Введіть номер телефону</label>
+              <div class="phone_input_wrap">
+                <input @input ="showOperator" class="phone_form_input form_input_first" type="text" maxlength="9">
+                <div class="error phone_error"></div>
+              </div>
+              <label class="phone_form_text" for="">Введіть суму поповнення</label>
+              <input id="price-input" class="phone_form_input form_input_last" type="text">
+              <div class="error price_error">Невірний код оператора</div>
+              <div class="value_buttons">
+                <p class="value_but" @click="setValue">50 грн</p>
+                <p class="value_but" @click="setValue">100 грн</p>
+                <p class="value_but" @click="setValue">200 грн</p>
+              </div>
+              <button  class="tariff_link" @click="checkData">
+                  Продовжити
+              </button>
+          </form>
+        </div>
+        <div class="tip_block">
+          <div class="tips">
+            <p class="tips_text">Оплатить можно за 3 простых шага:</p>
+            <ul class="tips_list">
+              <li class="tips_list_item">Введите данные об оплате;</li>
+              <li class="tips_list_item">Проверьте корректность данных;</li>
+              <li class="tips_list_item">Внесите данные платежной карты.</li>
+            </ul>
+          </div>
+          <div class="img_wrap">
+            <img src="https://ibox.ua/public/img/img_blog/image_mobile.svg" class="tip_block_pic">
+          </div>
+        </div>
       </div>
        `,
 };
@@ -216,6 +122,51 @@ const PayPage = {
 const PayCard = {
   data() {
     return {
+      operator: {},
+      tariff: {},
+    };
+  },
+  methods: {},
+  created() {
+  },
+  template: `
+    <div class="wrapper_form">
+      <div class="centered">
+          <form class="phone_form card_form" action="">
+              <label class="phone_form_text " for="">Введіть номер картки</label>
+              <input class="phone_form_input" type="text">
+
+              <label class="phone_form_text" for="">Введіть термін дії </label>
+              <input id="price-input" class="phone_form_input form_input_last" type="text">
+
+              <label class="phone_form_text" for="">Введіть CVV </label>
+              <input id="price-input" class="phone_form_input form_input_last" type="text">
+
+              
+          </form><router-link to="/pay/final" class="tariff_link">
+                Оплатити
+              </router-link>
+        </div>
+        <div class="tip_block">
+          <div class="tips">
+            <p class="tips_text">Оплатити можна за 3 простих кроки:</p>
+            <ul class="tips_list">
+              <li class="tips_list_item">Введіть дані об оплаті;</li>
+              <li class="tips_list_item">Перевірте коректність даних;</li>
+              <li class="tips_list_item">Внесіть дані платіжної картки.</li>
+            </ul>
+          </div>
+          <div class="img_wrap">
+            <img src="https://ibox.ua/public/img/img_blog/image_mobile.svg" class="tip_block_pic"/>
+          </div>
+        </div>
+      </div>
+       `,
+};
+
+const FinalPage = {
+  data() {
+    return {
       operators: [
         {
           id: 1,
@@ -230,86 +181,31 @@ const PayCard = {
           name: "Lifecell",
         },
       ],
-      tariffs: [
-        {
-          id: 1,
-          operatorId: 2,
-          name: "Сімейний",
-          cost: 150,
-        },
-        {
-          id: 2,
-          operatorId: 1,
-          name: "Для бомжей",
-          cost: 15,
-        },
-        {
-          id: 3,
-          operatorId: 3,
-          name: "Средний",
-          cost: 75,
-        },
-        {
-          id: 4,
-          operatorId: 1,
-          name: "Веселий",
-          cost: 228,
-        },
-        {
-          id: 5,
-          operatorId: 2,
-          name: "Інтернет на повну",
-          cost: 320,
-        },
-        {
-          id: 6,
-          operatorId: 3,
-          name: "ТОп за свої гроші",
-          cost: 190,
-        },
-      ],
-      operator: {},
-      tariff: {},
     };
   },
-  methods: {
-  },
-  created() {
-  },
+  methods: {},
+
+  created() {},
   template: `
       <div class="wrapper">
-        <form action="">
-            <label for="">
-                ВВедите что-то
-                <input type="text">
-            </label>
-            <label for="">
-                ВВедите что-то
-                <input type="text">
-            </label>
-            <button type="submit">submit</button>
-        </form>
+        <div class="transaction">
+          <div class="transactio_inner">
+            <h1 class="transaction_id">Транзакція #21 </h1>
+            <h2 class="transaction_text">Оплата проведена успішно</h2>
+          </div>
       </div>
        `,
 };
 
 const routes = [
-  { path: "/", component: Home },
-  {
-    path: "/operator/:id",
-    component: Operator,
-    name: "operatorId",
-    props: true,
-  },
-  {
-    path: "/pay/:id",
-    component: PayPage,
-    name: "tariffId",
-    props: true,
-  },
+  { path: "/", component: PayPage },
   {
     path: "/pay/card",
     component: PayCard,
+  },
+  {
+    path: "/pay/final",
+    component: FinalPage,
   },
 ];
 

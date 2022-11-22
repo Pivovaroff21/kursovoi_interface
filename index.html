@@ -1,21 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="./styles/reset.css" rel="stylesheet" type="text/css">
-    <link href="./styles/style.css" rel="stylesheet" type="text/css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayBox</title>
+    <link href="./styles/reset.css" rel="stylesheet" type="text/css" />
+    <link href="./styles/style.css" rel="stylesheet" type="text/css" />
+    <!-- vue js  -->
     <script src="https://unpkg.com/vue@next"></script>
+    <!-- vue router -->
     <script src="https://unpkg.com/vue-router@4"></script>
-    
-</head>
-<body>
-   <div id="app">
-        <router-view></router-view>
+    <!-- axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- fontawesome -->
+    <script src="https://kit.fontawesome.com/585c6efa86.js" crossorigin="anonymous"></script>
+  </head>
+  <body>
+     
+    <div id="app">
+      <header>
+        <div class="text_block">
+          <div class="wrapper">
+            <i class="fa-solid fa-phone"></i>
+            <span class="contact_phone">050 080 50 49</span>
+          </div>
+        </div>
+        <div class="logo_block">
+          <div class="wrapper">
+            <router-link to="/" class="logo_link">
+              <span class="logo_text">PAYBOX</span>
+            </router-link>
+          </div>
+        </div> 
+      </header>
+      <router-view></router-view>
+
     </div>
-   
-</body>
-<script src="./js/main.js"></script>
+  </body>
+  <script src="./js/main.js" type="module"></script>
+  
 </html>
