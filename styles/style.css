@@ -17,9 +17,7 @@ img {
   height: auto;
 }
 
-#app{
-    
-}
+
 
 
 /* operator styles*/
@@ -227,9 +225,35 @@ img {
     margin-bottom: 10px;
 
 }
+
+
+
 .phone_input_wrap{
     position: relative;
 }
+
+.Kyivstar::after , .Vodafone::after, .Lifecell::after{
+    content: "";
+    width: 50px;
+    height: 50px;
+    top: -15px;
+    right: 45px;
+    position: absolute;
+    display: inline-block;
+
+}
+
+.Kyivstar::after{
+     background: url(../img/1.png);
+}
+.Vodafone::after{
+    background: url(../img/2.png);
+}
+.Lifecell::after{
+    background: url(../img/3.png);
+}
+
+
 .phone_input_wrap::before{
     content:"+380";
     font-size: 24px;
@@ -241,17 +265,6 @@ img {
     top:1px;
 }
 
-.phone_input_wrap::after{
-    content: "";
-    width: 50px;
-    height: 50px;
-    background: var(--background);
-    top: -15px;
-    right: 45px;
-    position: absolute;
-    display: inline-block;
-}
-
 .error{
 
     display: none;
@@ -260,6 +273,7 @@ img {
     font-size: 16px;
     line-height: 22px;
 }
+
 
 
 .form_input_last{
@@ -304,9 +318,7 @@ img {
 }
 
 
-.card_form{
-   
-}
+
 
 /*header*/
 
@@ -336,7 +348,7 @@ img {
 }
 
 .logo_text{
-    display: block;
+    display: inline-block;
     font-size: 32px;
     line-height: 48px;
     color:#e14c9a;
@@ -349,7 +361,7 @@ img {
     transition: .25s;
     text-decoration: none;
 }
-.logo_link:hover{
+.logo_text:hover{
     opacity:0.5;
 }
 /*transaction styles*/
@@ -380,4 +392,8 @@ img {
 
 .transaction_text{
     color:green;
+}
+
+.transaction_text_red{
+    color:red;
 }

@@ -1,5 +1,3 @@
-import Swiper from "https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.esm.browser.min.js";
-
 /* Router */
 
 const PayPage = {
@@ -19,13 +17,13 @@ const PayPage = {
     },
     showOperator(e) {
       const value = e.target.value;
-      const logo = this.$el.querySelector(".phone_input_wrap").style;
+      const logo = this.$el.querySelector(".phone_input_wrap");
       const phoneError = this.$el.querySelector(".phone_error");
       if (value.length === 2) {
         let currentOperator = this.operators.find((op) => op.code === value);
         if (currentOperator) {
-          logo.setProperty("--background", `url(../${currentOperator.id}.png)`);
           this.currentOperatorId = currentOperator.id;
+          console.log(typeof this.currentOperatorId);
           phoneError.style.display = "none";
           this.isCodeValid = true;
         } else {
@@ -35,10 +33,11 @@ const PayPage = {
         }
       }
       if (value.length < 2) {
-        logo.setProperty("--background", `none`);
+         this.currentOperatorId = '';
       }
     },
-    checkData() {
+    checkData(e) {
+      e.preventDefault();
       const phoneError = this.$el.querySelector(".phone_error");
       const priceError = this.$el.querySelector(".price_error");
       const priceInput = this.$el.querySelector("#price-input").value;
@@ -88,8 +87,8 @@ const PayPage = {
         <div class="centered  card_form">
           <form class="phone_form" action="">
               <label class="phone_form_text " for="">Введіть номер телефону</label>
-              <div class="phone_input_wrap">
-                <input @input ="showOperator" class="phone_form_input form_input_first" type="text" maxlength="9">
+              <div class="phone_input_wrap" :class="{Kyivstar:currentOperatorId === '1',Vodafone:currentOperatorId === '2',Lifecell:currentOperatorId === '3'}">
+                <input @input ="showOperator" class="phone_form_input form_input_first"  type="text" maxlength="9">
                 <div class="error phone_error"></div>
               </div>
               <label class="phone_form_text" for="">Введіть суму поповнення</label>
@@ -126,7 +125,6 @@ const PayCard = {
   data() {
     return {
       cards: [],
-      tariff: {},
       errors: [],
       transaction: [],
     };
@@ -138,15 +136,17 @@ const PayCard = {
       const cardDate = this.$el.querySelector("#card_date");
       const cardCvv = this.$el.querySelector("#card_cvv");
       const dateError = this.$el.querySelector(".date_error");
+      let transactionData = JSON.parse(localStorage.getItem("transactionData"));
       let dateParsed = cardDate.value.split("/");
       let isCardDate = false;
       let isCardCvv = false;
-
+      
       let currentCard = this.cards.find(function (card) {
         if (card.card_number === cardNumber.value) return card;
       });
 
       if (currentCard) {
+        transactionData.cardId = currentCard.id;
         isCardCvv = currentCard["c_cvv"] === cardCvv.value;
         if (
           currentCard["c_month"] === dateParsed[0] &&
@@ -156,25 +156,27 @@ const PayCard = {
         } else {
           isCardDate = false;
         }
+         transactionData.date = new Date().toLocaleString();
+
+         if (Number(currentCard.balance) < Number(transactionData.totalValue)) {
+           transactionData.status = "0";
+           transactionData.newBalance = currentCard.balance;
+         } else {
+           transactionData.status = "1";
+           transactionData.newBalance =
+             Number(currentCard.balance) - Number(transactionData.totalValue);
+         }
       }
 
-      let transactionData = JSON.parse(localStorage.getItem("transactionData"));
-      transactionData.date = new Date().toLocaleString();
-
-      if(Number(currentCard.balance) < Number(transactionData.totalValue)){
-        transactionData.status = "0";
-      }else{
-        transactionData.status = "1";
-      }
+     
 
       if (currentCard && isCardCvv && isCardDate) {
         let formData = new FormData();
-        if(transactionData){
-          for(let i in transactionData){
+        if (transactionData) {
+          for (let i in transactionData) {
             formData.append(i, transactionData[i]);
           }
         }
-        
         axios
           .post(
             "http://kursovoiproject/api/newTransaction?auth=dIC349vWSpXx234NmQP21rvIeDd",
@@ -187,12 +189,11 @@ const PayCard = {
           .catch(function (error) {
             console.log(error);
           });
-        
       } else {
         dateError.textContent = "Перевірте правильність даних";
         dateError.style.display = "block";
-      } 
-    }
+      }
+    },
   },
   created() {
     axios
@@ -213,7 +214,7 @@ const PayCard = {
               <label class="phone_form_text " for="">Введіть номер картки</label>
               <input id="card_number" class="phone_form_input form_input_last" type="text" maxlength="16">
               <label class="phone_form_text" for="">Введіть термін дії </label>
-              <input id ="card_date" @input="checkDate" class="phone_form_input form_input_last" type="text" maxlength="5">
+              <input id ="card_date" class="phone_form_input form_input_last" type="text" maxlength="5">
               <label class="phone_form_text" for="">Введіть CVV </label>
               <input id ="card_cvv" class="phone_form_input form_input_last" type="text" maxlength="3">
               <div class="error date_error"></div>
@@ -249,17 +250,16 @@ const FinalPage = {
   methods: {},
 
   created() {
-     axios
-       .get(
-         `http://kursovoiproject/api/getLastTransaction?auth=dIC349vWSpXx234NmQP21rvIeDd`
-       )
-       .then((response) => {
-         this.currentTransaction = response.data;
-       })
-       .catch((e) => {
-         this.errors.push(e);
-       });
-    
+    axios
+      .get(
+        `http://kursovoiproject/api/getLastTransaction?auth=dIC349vWSpXx234NmQP21rvIeDd`
+      )
+      .then((response) => {
+        this.currentTransaction = response.data;
+      })
+      .catch((e) => {
+        this.errors.push(e);
+      });
   },
   template: `
       <div class="wrapper">
@@ -283,7 +283,6 @@ const routes = [
   {
     path: "/pay/final",
     component: FinalPage,
-   
   },
 ];
 
